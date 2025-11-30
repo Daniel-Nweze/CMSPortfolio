@@ -16,6 +16,20 @@
     <RuntimeHostConfigurationOption Include="System.Globalization.AppLocalIcu" Value="72.1.0.3" Condition="$(RuntimeIdentifier.StartsWith('linux')) or $(RuntimeIdentifier.StartsWith('win')) or ('$(RuntimeIdentifier)' == '' and !$([MSBuild]::IsOSPlatform('osx')))" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="CMSPortfolio\" />
+    <Folder Include="Components\" />
+    <Folder Include="Controllers\" />
+    <Folder Include="Data\" />
+    <Folder Include="Layout\" />
+    <Folder Include="Models\" />
+    <Folder Include="Navigation\" />
+    <Folder Include="Partials\" />
+    <Folder Include="Services\" />
+    <Folder Include="Shared\" />
+    <Folder Include="Viewmodels\" />
+  </ItemGroup>
+
   <PropertyGroup>
     <!-- Razor files are needed for the backoffice to work correctly -->
     <CopyRazorGenerateFilesToPublishDirectory>true</CopyRazorGenerateFilesToPublishDirectory>
