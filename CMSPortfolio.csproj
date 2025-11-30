@@ -21,12 +21,10 @@
     <Folder Include="Components\" />
     <Folder Include="Controllers\" />
     <Folder Include="Data\" />
-    <Folder Include="Layout\" />
     <Folder Include="Models\" />
     <Folder Include="Navigation\" />
     <Folder Include="Partials\" />
     <Folder Include="Services\" />
-    <Folder Include="Shared\" />
     <Folder Include="Viewmodels\" />
   </ItemGroup>
 

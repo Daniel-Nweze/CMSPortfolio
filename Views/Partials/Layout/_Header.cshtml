@@ -1,0 +1,36 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+
+<header class="site-header" role="banner">
+    <div class="site-header-inner">
+        <a href="~/" class="brand">
+            <div class="brand-mark"></div>
+            <div class="brand-text">
+                <span>NWEZE</span>
+                <span>Portfolio</span>
+            </div>
+        </a>
+
+        <nav class="main-nav" role="navigation" aria-label="Main navigation">
+            <div class="nav-links">
+                <!-- TODO: Dynamic navigation via NavigationService in later phase -->
+                <a href="~/" class="nav-link">Home</a>
+                <a href="#" class="nav-link">About</a>
+                <a href="#" class="nav-link">Skills</a>
+                <a href="#" class="nav-link">Portfolio</a>
+                <a href="#" class="nav-link">References</a>
+                <a href="#" class="nav-link">Contact</a>
+            </div>
+
+            <div class="header-tools">
+                <div class="lang-switch">
+                    <!-- TODO: Real language switch in multilingual phase -->
+                    <strong>SV</strong> / EN
+                </div>
+
+                <form class="header-search" method="get" action="/search">
+                    <input type="search" name="q" placeholder="Sök..." />
+                </form>
+            </div>
+        </nav>
+    </div>
+</header>
