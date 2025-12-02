@@ -1,5 +1,26 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@using Umbraco.Extensions
+
 @{
-	Layout = null;
+    Layout = "layout.cshtml";
+    var heading = Model.Name;
+    var message = Model.Value<string>("message");
+    ViewBag.Title = heading + " | Portfolio";
 }
+
+<section>
+    <h1 class="hero-title">@heading</h1>
+
+    @if (!string.IsNullOrWhiteSpace(message))
+    {
+        <div class="hero-subtitle" style="margin-top:1.5rem;">
+            @Html.Raw(message)
+        </div>
+    }
+    else
+    {
+        <p class="hero-subtitle" style="margin-top:1.5rem;">
+            Sidan du letar efter finns inte. Använd navigationen ovan för att gå vidare.
+        </p>
+    }
+</section>

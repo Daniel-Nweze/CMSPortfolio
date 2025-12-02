@@ -1,5 +1,22 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@using Umbraco.Extensions
+
 @{
-	Layout = "layout.cshtml";
+    Layout = "layout.cshtml";
+    var heading = Model.Name;
+    var introText = Model.Value<string>("introText");
+    ViewBag.Title = heading + " | Portfolio";
 }
+
+<section>
+    <h1 class="hero-title">@heading</h1>
+
+    @if (!string.IsNullOrWhiteSpace(introText))
+    {
+        <p class="hero-subtitle">@introText</p>
+    }
+
+    <p class="hero-subtitle" style="margin-top:1.5rem;">
+        Här kommer både manuella projekt och GitHub-data i senare faser.
+    </p>
+</section>

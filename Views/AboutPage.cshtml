@@ -1,5 +1,22 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@using Umbraco.Extensions
+
 @{
-	Layout = "layout.cshtml";
+    Layout = "layout.cshtml";
+    var heading = Model.Name;
+    var bodyText = Model.Value<string>("bodyText");
+    ViewBag.Title = heading + " | Portfolio";
 }
+
+<section>
+    <h1 class="hero-title">@heading</h1>
+    <p class="hero-subtitle">
+    </p>
+
+    @if (!string.IsNullOrWhiteSpace(bodyText))
+    {
+        <div class="hero-subtitle" style="max-width: 52rem; margin-top: 1.5rem;">
+            @Html.Raw(bodyText)
+        </div>
+    }
+</section>

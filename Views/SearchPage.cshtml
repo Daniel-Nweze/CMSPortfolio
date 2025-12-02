@@ -1,5 +1,15 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@using Umbraco.Extensions
+
 @{
-	Layout = null;
+    Layout = "layout.cshtml";
+    var heading = Model.Name;
+    ViewBag.Title = heading + " | Portfolio";
 }
+
+<section>
+    <h1 class="hero-title">@heading</h1>
+    <p class="hero-subtitle">
+        Sökfunktionen implementeras här senare. Resultat kommer visas per sida, portfolio och referenser.
+    </p>
+</section>
