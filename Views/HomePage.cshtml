@@ -1,5 +1,34 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@using Umbraco.Extensions
+
 @{
-	Layout = null;
+    Layout = "layout.cshtml";
+
+    var heroTagline = Model.Value<string>("heroTagline") ?? "Webbutvecklare .NET";
+    var heroTitle = Model.Value<string>("heroTitle") 
+                    ?? "Minimal, tydlig och professionell portfolio i Umbraco 13.";
+    var heroSubtitle = Model.Value<string>("heroSubtitle") 
+                       ?? "Jag bygger skalbara .NET-lösningar, tydliga API-integrationer och rena gränssnitt.";
+    var heroPanelText = Model.Value<string>("heroPanelText") 
+                        ?? "Här kommer jag visa skills, portfolio, referenser och ett riktigt kontaktformulär.";
+
+    ViewBag.Title = heroTitle + " | Portfolio";
 }
+
+<section class="hero">
+    <div>
+        <div class="hero-pill">
+            <span>@heroTagline</span>
+        </div>
+        <h1 class="hero-title">
+            @heroTitle
+        </h1>
+        <p class="hero-subtitle">
+            @heroSubtitle
+        </p>
+    </div>
+
+    <aside class="hero-panel">
+        @Html.Raw(heroPanelText)
+    </aside>
+</section>
