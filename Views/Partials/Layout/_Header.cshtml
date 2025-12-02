@@ -1,8 +1,22 @@
 ﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@using System.Linq
+@using Umbraco.Cms.Core.Models.PublishedContent
+@using Umbraco.Extensions
+
+@{
+    var currentPage = Model as IPublishedContent;
+    var root = currentPage?.Root();
+    var navItems = root?.Children?
+        .Where(x => x.IsVisible() && x.ContentType.Alias != "searchPage" && x.ContentType.Alias != "errorPage")
+        .OrderBy(x => x.SortOrder)
+        .ToList() ?? new List<IPublishedContent>();
+
+    string? currentUrl = currentPage?.Url();
+}
 
 <header class="site-header" role="banner">
     <div class="site-header-inner">
-        <a href="~/" class="brand">
+        <a href="@root?.Url()" class="brand">
             <div class="brand-mark"></div>
             <div class="brand-text">
                 <span>NWEZE</span>
@@ -12,22 +26,25 @@
 
         <nav class="main-nav" role="navigation" aria-label="Main navigation">
             <div class="nav-links">
-                <!-- TODO: Dynamic navigation via NavigationService in later phase -->
-                <a href="~/" class="nav-link">Home</a>
-                <a href="#" class="nav-link">About</a>
-                <a href="#" class="nav-link">Skills</a>
-                <a href="#" class="nav-link">Portfolio</a>
-                <a href="#" class="nav-link">References</a>
-                <a href="#" class="nav-link">Contact</a>
+                @foreach (var item in navItems)
+                {
+                    var itemUrl = item.Url();
+                    var isActive = currentUrl != null && currentUrl.StartsWith(itemUrl);
+                    <a href="@itemUrl" class="nav-link @(isActive ? "active" : "")">
+                        @item.Name
+                    </a>
+                }
             </div>
 
             <div class="header-tools">
                 <div class="lang-switch">
-                    <!-- TODO: Real language switch in multilingual phase -->
+                    <!-- TODO Phase 2b: riktig språkväxling -->
                     <strong>SV</strong> / EN
                 </div>
 
-                <form class="header-search" method="get" action="/search">
+                <form class="header-search"
+                      method="get"
+                      action="@root?.Children.FirstOrDefault(x => x.ContentType.Alias == "searchPage")?.Url()">
                     <input type="search" name="q" placeholder="Sök..." />
                 </form>
             </div>
