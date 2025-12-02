@@ -1,17 +1,44 @@
 ﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
 @using System.Linq
+@using System.Collections.Generic
+@using System.Globalization
 @using Umbraco.Cms.Core.Models.PublishedContent
 @using Umbraco.Extensions
 
 @{
     var currentPage = Model as IPublishedContent;
     var root = currentPage?.Root();
+
     var navItems = root?.Children?
-        .Where(x => x.IsVisible() && x.ContentType.Alias != "searchPage" && x.ContentType.Alias != "errorPage")
+        .Where(x => x.IsVisible()
+                    && x.ContentType.Alias != "searchPage"
+                    && x.ContentType.Alias != "errorPage")
         .OrderBy(x => x.SortOrder)
         .ToList() ?? new List<IPublishedContent>();
 
-    string? currentUrl = currentPage?.Url();
+    var currentUrl = currentPage?.Url();
+
+    // --- Språkinfo ---
+    var currentCultureName = CultureInfo.CurrentUICulture.Name; // t.ex. "sv-SE" eller "en-US"
+    var isSv = currentCultureName.StartsWith("sv", StringComparison.OrdinalIgnoreCase);
+    var isEn = currentCultureName.StartsWith("en", StringComparison.OrdinalIgnoreCase);
+
+    // Försök att länka till samma sida i andra språket, annars fall back till root
+    var svUrl = currentPage?.Url("sv-SE")
+                ?? root?.Url("sv-SE")
+                ?? "/";
+
+    var enUrl = currentPage?.Url("en-US")
+                ?? root?.Url("en-US")
+                ?? "/en/";
+
+    // Dictionary för sök-placeholder (läggs till strax i backoffice)
+    var culture = isSv ? new CultureInfo("sv-SE") : new CultureInfo("en-US");
+
+    var searchPlaceholder =
+        Umbraco.GetDictionaryValue("SearchPlaceholder", culture)
+        ?? (isSv ? "Sök..." : "Search...");
+
 }
 
 <header class="site-header" role="banner">
@@ -30,6 +57,7 @@
                 {
                     var itemUrl = item.Url();
                     var isActive = currentUrl != null && currentUrl.StartsWith(itemUrl);
+
                     <a href="@itemUrl" class="nav-link @(isActive ? "active" : "")">
                         @item.Name
                     </a>
@@ -37,15 +65,14 @@
             </div>
 
             <div class="header-tools">
-                <div class="lang-switch">
-                    <!-- TODO Phase 2b: riktig språkväxling -->
-                    <strong>SV</strong> / EN
+                <div class="lang-switch" aria-label="Language switcher">
+                    <a href="@svUrl" class="@(isSv ? "active" : "")">SV</a>
+                    <span>/</span>
+                    <a href="@enUrl" class="@(isEn ? "active" : "")">EN</a>
                 </div>
 
-                <form class="header-search"
-                      method="get"
-                      action="@root?.Children.FirstOrDefault(x => x.ContentType.Alias == "searchPage")?.Url()">
-                    <input type="search" name="q" placeholder="Sök..." />
+                <form class="header-search" method="get" action="@root?.Children.FirstOrDefault(x => x.ContentType.Alias == "searchPage")?.Url()">
+                    <input type="search" name="q" placeholder="@searchPlaceholder" />
                 </form>
             </div>
         </nav>
