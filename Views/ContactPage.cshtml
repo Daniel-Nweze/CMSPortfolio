@@ -1,22 +1,70 @@
-﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
-@using Umbraco.Extensions
+﻿@using Umbraco.Cms.Web.Common.PublishedModels;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
 
 @{
     Layout = "layout.cshtml";
-    var heading = Model.Name;
+
     var introText = Model.Value<string>("introText");
-    ViewBag.Title = heading + " | Portfolio";
+    var successMessage = TempData["ContactFormSuccess"] as string;
+    var errorMessage = TempData["ContactFormError"] as string;
 }
 
-<section>
-    <h1 class="hero-title">@heading</h1>
+<section class="contact-page">
+    <div class="container">
+        <h1>@Model.Name</h1>
 
-    @if (!string.IsNullOrWhiteSpace(introText))
-    {
-        <p class="hero-subtitle">@introText</p>
-    }
+        @if (!string.IsNullOrWhiteSpace(introText))
+        {
+            @Html.Raw(introText)
+        }
 
-    <p class="hero-subtitle" style="margin-top:1.5rem;">
-        Här kommer ett riktigt kontaktformulär med NPoco-lagring.
-    </p>
+
+        @if (!string.IsNullOrWhiteSpace(successMessage))
+        {
+            <div class="alert alert-success">@successMessage</div>
+        }
+        else if (!string.IsNullOrWhiteSpace(errorMessage))
+        {
+            <div class="alert alert-error">@errorMessage</div>
+        }
+
+        @using (Html.BeginUmbracoForm("Submit", "ContactForm", FormMethod.Post, new
+        {
+            @class = "contact-form",
+            id = "contactForm",
+            data_contact_form = "true",
+            novalidate = "novalidate"
+        }))
+        {
+            <div class="form-field">
+                <label for="Name">Name</label>
+                <input id="Name" name="Name" type="text" required data-validate data-required="true" />
+                <span class="field-error"></span>
+            </div>
+
+            <div class="form-field">
+                <label for="Email">Email</label>
+                <input id="Email" name="Email" type="email" required data-validate data-required="true" />
+                <span class="field-error"></span>
+            </div>
+
+            <div class="form-field">
+                <label for="Subject">Subject</label>
+                <input id="Subject" name="Subject" type="text" required data-validate data-required="true" data-required-message="Please enter a subject" />
+                <span class="field-error"></span>
+            </div>
+
+            <div class="form-field">
+                <label for="Message">Message</label>
+                <textarea id="Message" name="Message" rows="5" required data-validate data-required="true"></textarea>
+                <span class="field-error"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Send</button>
+        }
+    </div>
 </section>
+
+@section Scripts {
+    <script src="~/js/contact-validation.js"></script>
+}
