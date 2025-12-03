@@ -1,15 +1,120 @@
-﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
-@using Umbraco.Extensions
+﻿@using System.Collections.Generic
+@using Examine
+@using Umbraco.Cms.Core
+@using Umbraco.Cms.Core.Models.PublishedContent
+@using Umbraco.Cms.Core.Web
+@using Umbraco.Cms.Web.Common
+@using ContentModels = Umbraco.Cms.Web.Common.PublishedModels;
+
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+
+@inject IExamineManager ExamineManager
+@inject IUmbracoContextFactory UmbracoContextFactory
 
 @{
     Layout = "layout.cshtml";
-    var heading = Model.Name;
-    ViewBag.Title = heading + " | Portfolio";
+
+    // query från ?q= i URL:en
+    var query = Context.Request.Query["q"].ToString()?.Trim();
+    var hasQuery = !string.IsNullOrWhiteSpace(query);
+
+    var currentRoot = Model.Root();
+    var currentRootKey = currentRoot?.Key;
+
+    var results = new List<IPublishedContent>();
+
+    if (hasQuery && ExamineManager.TryGetIndex(Constants.UmbracoIndexes.ExternalIndexName, out var index))
+    {
+        var searcher = index.Searcher;
+
+        // enkel "managed" text-sökning
+        var examineQuery = searcher
+            .CreateQuery("content")
+            .ManagedQuery(query);
+
+        var searchResults = examineQuery.Execute();
+
+        using var cref = UmbracoContextFactory.EnsureUmbracoContext();
+        var contentCache = cref.UmbracoContext.Content;
+
+        foreach (var item in searchResults)
+        {
+            if (!int.TryParse(item.Id, out var nodeId))
+                continue;
+
+            var content = contentCache.GetById(nodeId);
+            if (content == null)
+                continue;
+
+            var root = content.Root();
+            if (root == null || root.Key != currentRootKey)
+                continue; // filtrera bort andra språk/webbplatser
+
+            var alias = content.ContentType.Alias;
+
+            // Begränsa till dina relevanta sidtyper
+            if (alias is "homePage"
+                     or "aboutPage"
+                     or "skillsPage"
+                     or "portfolioPage"
+                     or "referencesPage"
+                     or "contactPage"
+                     or "portfolioItem")
+            {
+                results.Add(content);
+            }
+        }
+    }
+
+    var count = results.Count;
 }
 
-<section>
-    <h1 class="hero-title">@heading</h1>
-    <p class="hero-subtitle">
-        Sökfunktionen implementeras här senare. Resultat kommer visas per sida, portfolio och referenser.
-    </p>
+<section class="search-page">
+    <div class="container">
+        <header class="search-page__header">
+            <h1>Sök</h1>
+
+            <form method="get" action="@Model.Url()" class="search-page__form">
+                <input type="search"
+                       name="q"
+                       value="@query"
+                       placeholder="Sök efter innehåll..."
+                       class="search-input" />
+                <button type="submit" class="btn btn-primary">Sök</button>
+            </form>
+        </header>
+
+        @if (!hasQuery)
+        {
+            <p class="search-page__info">
+                Skriv något i sökfältet och tryck på Sök.
+            </p>
+        }
+        else if (count == 0)
+        {
+            <p class="search-page__info">
+                Inga träffar för "<strong>@query</strong>".
+            </p>
+        }
+        else
+        {
+            <p class="search-page__info">
+                @count träff@(count == 1 ? "" : "ar") för "<strong>@query</strong>".
+            </p>
+
+            <ul class="search-page__results">
+                @foreach (var node in results)
+                {
+                    <li class="search-result">
+                        <a href="@node.Url()" class="search-result__title">
+                            @node.Name
+                        </a>
+                        <div class="search-result__meta">
+                            @node.ContentType.Alias
+                        </div>
+                    </li>
+                }
+            </ul>
+        }
+    </div>
 </section>

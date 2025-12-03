@@ -39,7 +39,13 @@
         Umbraco.GetDictionaryValue("SearchPlaceholder", culture)
         ?? (isSv ? "Sök..." : "Search...");
 
+    var searchPage = root?
+             .Children
+             .FirstOrDefault(x => x.ContentType.Alias == "searchPage");
+
+    var searchUrl = searchPage?.Url() ?? "#";
 }
+
 
 <header class="site-header" role="banner">
     <div class="site-header-inner">
@@ -71,9 +77,14 @@
                     <a href="@enUrl" class="@(isEn ? "active" : "")">EN</a>
                 </div>
 
-                <form class="header-search" method="get" action="@root?.Children.FirstOrDefault(x => x.ContentType.Alias == "searchPage")?.Url()">
-                    <input type="search" name="q" placeholder="@searchPlaceholder" />
+                <form method="get" action="@searchUrl" class="header-search">
+                    <input type="search"
+                           name="q"
+                           placeholder=@searchPlaceholder
+                           class="header-search__input" />
                 </form>
+
+
             </div>
         </nav>
     </div>
