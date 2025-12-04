@@ -1,23 +1,43 @@
-﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
-@using Umbraco.Extensions
+﻿<section class="page-section portfolio-section">
+    <div class="page-container">
+        <h1>@Model.Page.Name</h1>
 
-@{
-    Layout = "layout.cshtml";
-    var heading = Model.Name;
-    var introText = Model.Value<string>("introText");
-    ViewBag.Title = heading + " | Portfolio";
-}
+        @* Om du har ett rich text-fält senare:
+           @Model.Page.Value("bodyTextAlias")
+        *@
 
-<section>
-    <h1 class="hero-title">@heading</h1>
+        <h2 class="section-heading">Latest GitHub projects</h2>
 
-    @if (!string.IsNullOrWhiteSpace(introText))
-    {
-        @Html.Raw(introText)
-    }
+        @if (Model.GitHubRepositories.Any())
+        {
+            <div class="repo-grid">
+                @foreach (var repo in Model.GitHubRepositories)
+                {
+                    <article class="repo-card">
+                        <h3>
+                            <a href="@repo.HtmlUrl" target="_blank" rel="noopener">
+                                @repo.Name
+                            </a>
+                        </h3>
 
+                        <p class="repo-description">
+                            @(!string.IsNullOrWhiteSpace(repo.Description)
+                                                ? repo.Description
+                                                : "No description provided.")
+                </p>
 
-    <p class="hero-subtitle" style="margin-top:1.5rem;">
-        Här kommer både manuella projekt och GitHub-data i senare faser.
-    </p>
+                        <div class="repo-meta">
+                            <span>@repo.Language</span>
+                            <span>@repo.Stars ★</span>
+                            <span>@repo.LastPushDate.ToLocalTime().ToString("yyyy-MM-dd")</span>
+                        </div>
+                    </article>
+                        }
+            </div>
+        }
+        else
+        {
+            <p>No public repositories could be loaded right now.</p>
+        }
+    </div>
 </section>

@@ -1,34 +1,50 @@
 ﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
-@using Umbraco.Extensions
+@using CMSPortfolio.Models.External
+@inject CMSPortfolio.Services.SecondaryApiService SecondaryApiService
 
 @{
-    Layout = "layout.cshtml";
+    var quote = await SecondaryApiService.GetQuoteAsync();
+}
 
-    var heroTagline = Model.Value<string>("heroTagline") ?? "Webbutvecklare .NET";
-    var heroTitle = Model.Value<string>("heroTitle") 
-                    ?? "Minimal, tydlig och professionell portfolio i Umbraco 13.";
-    var heroSubtitle = Model.Value<string>("heroSubtitle") 
-                       ?? "Jag bygger skalbara .NET-lösningar, tydliga API-integrationer och rena gränssnitt.";
-    var heroPanelText = Model.Value<string>("heroPanelText") 
-                        ?? "Här kommer jag visa skills, portfolio, referenser och ett riktigt kontaktformulär.";
 
-    ViewBag.Title = heroTitle + " | Portfolio";
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Home | Portfolio";
 }
 
 <section class="hero">
     <div>
         <div class="hero-pill">
-            <span>@heroTagline</span>
+            <span>Webbutvecklare .NET</span>
         </div>
+        @if (quote is not null)
+        {
+            <aside class="quote-widget">
+                <p class="quote-text">"@quote.Text"</p>
+                <p class="quote-author">— @quote.Author</p>
+            </aside>
+        }
+
         <h1 class="hero-title">
-            @heroTitle
+            Minimal, tydlig och professionell portfolio i Umbraco 13.
         </h1>
         <p class="hero-subtitle">
-            @heroSubtitle
+            Jag bygger skalbara .NET-lösningar, tydliga API-integrationer och rena gränssnitt.
+            Den här sidan är byggd för att vara lika enkel att förstå som att vidareutveckla.
         </p>
     </div>
 
     <aside class="hero-panel">
-        @Html.Raw(heroPanelText)
+        <p>
+            Här kommer jag visa:
+        </p>
+        <ul>
+            <li>➤ Mina skills (backend, frontend, verktyg)</li>
+            <li>➤ Portfolio-projekt – både manuella och GitHub-data</li>
+            <li>➤ Referenser och kontaktformulär med riktig lagring</li>
+        </ul>
+        <p style="margin-top: 0.8rem; color: #e5e7eb;">
+            Allt innehåll är dynamiskt och redigerbart i Umbraco-backoffice.
+        </p>
     </aside>
 </section>
