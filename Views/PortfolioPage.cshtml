@@ -1,4 +1,13 @@
-﻿<section class="page-section portfolio-section">
+﻿@using CMSPortfolio.Models.Viewmodels
+@using CMSPortfolio.Models.External
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<PortfolioPageViewModel>
+
+@{
+    Layout = "layout.cshtml";
+}
+
+
+<section class="page-section portfolio-section">
     <div class="page-container">
         <h1>@Model.Page.Name</h1>
 

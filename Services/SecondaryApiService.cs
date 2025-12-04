@@ -10,7 +10,7 @@ namespace CMSPortfolio.Services
 {
     public class SecondaryApiService
     {
-        private const string CacheKey = "quote_of_the_day";
+        private const string CacheKey = "quotes_batch";
 
         private readonly HttpClient _httpClient;
         private readonly IMemoryCache _cache;
@@ -31,45 +31,40 @@ namespace CMSPortfolio.Services
             _logger = logger;
         }
 
-        public async Task<QuoteOfTheDay?> GetQuoteAsync(bool forceRefresh = false)
+
+        public async Task<List<QuoteOfTheDay>> GetQuotesBatchAsync()
         {
-            if (!forceRefresh &&
-                _cache.TryGetValue(CacheKey, out QuoteOfTheDay? cached))
-            {
-                return cached;
-            }
+            if (_cache.TryGetValue(CacheKey, out List<QuoteOfTheDay>? cached))
+                return cached!;
 
             try
             {
-                // t.ex. https://api.quotable.io/random
-                var response = await _httpClient.GetAsync("/random");
+                // Hämta 20 citat i ett paket
+                var response = await _httpClient.GetAsync("https://zenquotes.io/api/quotes");
 
                 if (!response.IsSuccessStatusCode)
-                {
-                    _logger.LogWarning("Quote API returned {StatusCode}", response.StatusCode);
-                    return GetCachedOrNull();
-                }
+                    return cached ?? new List<QuoteOfTheDay>();
 
                 var json = await response.Content.ReadAsStringAsync();
+                var arr = JsonSerializer.Deserialize<List<Dictionary<string, string>>>(json);
 
-                var dto = JsonSerializer.Deserialize<QuoteApiResponseDto>(json, JsonOptions);
-                if (dto == null || string.IsNullOrWhiteSpace(dto.Content))
-                    return GetCachedOrNull();
+                if (arr == null) return cached ?? new List<QuoteOfTheDay>();
 
-                var quote = new QuoteOfTheDay
-                {
-                    Text = dto.Content!,
-                    Author = string.IsNullOrWhiteSpace(dto.Author) ? "Unknown" : dto.Author!
-                };
+                var list = arr.Take(20)
+                              .Select(x => new QuoteOfTheDay
+                              {
+                                  Text = x["q"],
+                                  Author = x["a"]
+                              })
+                              .ToList();
 
-                _cache.Set(CacheKey, quote, TimeSpan.FromHours(1));
+                _cache.Set(CacheKey, list, TimeSpan.FromMinutes(10));
 
-                return quote;
+                return list;
             }
-            catch (Exception ex)
+            catch
             {
-                _logger.LogError(ex, "Error calling quote API");
-                return GetCachedOrNull();
+                return cached ?? new List<QuoteOfTheDay>();
             }
         }
 

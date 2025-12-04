@@ -49,7 +49,7 @@ namespace CMSPortfolio.Services
                 _logger.LogInformation("Refreshing API caches...");
 
                 await _gitHubApiService.GetRepositoriesAsync(forceRefresh: true);
-                await _secondaryApiService.GetQuoteAsync(forceRefresh: true);
+                await _secondaryApiService.GetQuotesBatchAsync();
 
                 _logger.LogInformation("API caches refreshed.");
             }

@@ -3,13 +3,9 @@
 @inject CMSPortfolio.Services.SecondaryApiService SecondaryApiService
 
 @{
-    var quote = await SecondaryApiService.GetQuoteAsync();
-}
-
-
-@{
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = "layout.cshtml";
     ViewBag.Title = "Home | Portfolio";
+    var quote = await SecondaryApiService.GetQuotesBatchAsync();
 }
 
 <section class="hero">
@@ -17,13 +13,21 @@
         <div class="hero-pill">
             <span>Webbutvecklare .NET</span>
         </div>
-        @if (quote is not null)
-        {
-            <aside class="quote-widget">
-                <p class="quote-text">"@quote.Text"</p>
-                <p class="quote-author">— @quote.Author</p>
-            </aside>
-        }
+
+
+        <aside class="quote-widget">
+            <div class="ticker-track">
+                <div class="ticker-content" id="ticker1"></div>
+                <div class="ticker-content" id="ticker2"></div>
+            </div>
+        </aside>
+
+
+
+
+
+
+        
 
         <h1 class="hero-title">
             Minimal, tydlig och professionell portfolio i Umbraco 13.
@@ -48,3 +52,70 @@
         </p>
     </aside>
 </section>
+
+@section Scripts {
+    <script>
+
+                async function loadQuotes() {
+            const res = await fetch("/api/quote");
+            const quotes = await res.json();
+
+            const line = quotes
+                .map(q => `"${q.text}" — ${q.author}`)
+                .join("   •••   "); // separator
+
+            const ticker1 = document.getElementById("ticker1");
+            const ticker2 = document.getElementById("ticker2");
+            const tickerTrack = document.querySelector(".ticker-track");
+
+            // Sätt texten
+            ticker1.textContent = line;
+            ticker2.textContent = line;
+
+            // --- Beräkna bredd och tid för konstant hastighet ---
+
+            // Bredden på den första textsträngen (den är likadan som den andra)
+            // OBS! Vi måste ta bredden efter att texten satts.
+            const textWidth = ticker1.offsetWidth;
+
+            // Önskad hastighet i pixlar per sekund (t.ex. 50px/s)
+            const SPEED_PX_PER_SECOND = 50;
+
+            // Animationstid = sträckan / hastigheten. Vi rullar 50% (bredden av en ticker)
+            const durationSeconds = textWidth / SPEED_PX_PER_SECOND;
+
+            // --- Sätt dynamisk CSS-animation ---
+
+            const animationName = `tickerScroll-${Math.random().toString(36).substring(7)}`; // Unikt namn
+
+            // Skapa en ny <style> tagg med de dynamiska nyckelramarna
+            const styleSheet = document.createElement("style");
+            styleSheet.type = "text/css";
+            styleSheet.innerText = `
+                @@keyframes ${animationName} {
+                    0% { transform: translateX(0); }
+                    100% { transform: translateX(-50%); }
+                }
+            `;
+            document.head.appendChild(styleSheet);
+
+            // Applicera animationen med den beräknade tiden
+            tickerTrack.style.animation = `${animationName} ${durationSeconds}s linear infinite`;
+
+        }
+
+        loadQuotes();
+        setInterval(loadQuotes, 600000);
+
+    </script>
+}
+
+
+
+
+
+
+
+
+
+

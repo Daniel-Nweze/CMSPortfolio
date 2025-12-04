@@ -32,20 +32,27 @@
                 ?? root?.Url("en-US")
                 ?? "/en/";
 
-    // Dictionary för sök-placeholder (läggs till strax i backoffice)
     var culture = isSv ? new CultureInfo("sv-SE") : new CultureInfo("en-US");
 
+    // Dictionary för sök-placeholder
     var searchPlaceholder =
         Umbraco.GetDictionaryValue("SearchPlaceholder", culture)
         ?? (isSv ? "Sök..." : "Search...");
 
     var searchPage = root?
-             .Children
-             .FirstOrDefault(x => x.ContentType.Alias == "searchPage");
+        .Children
+        .FirstOrDefault(x => x.ContentType.Alias == "searchPage");
 
     var searchUrl = searchPage?.Url() ?? "#";
-}
 
+    // Dictionary för Hem/Home – skapa t.ex. "NavigationHome" i backoffice
+    var homeLabel =
+        Umbraco.GetDictionaryValue("NavigationHome", culture)
+        ?? (isSv ? "Hem" : "Home");
+
+    // URL för root i aktuell kultur
+    var homeUrl = root?.Url(culture.Name) ?? "/";
+}
 
 <header class="site-header" role="banner">
     <div class="site-header-inner">
@@ -59,10 +66,23 @@
 
         <nav class="main-nav" role="navigation" aria-label="Main navigation">
             <div class="nav-links">
+
+                @* Hem / Home först *@
+                @if (root != null)
+                {
+                    var isHomeActive = currentUrl != null
+                    && currentUrl.StartsWith(homeUrl, StringComparison.OrdinalIgnoreCase);
+
+                    <a href="@homeUrl" class="nav-link @(isHomeActive ? "active" : "")">
+                        @homeLabel
+                    </a>
+                }
+
+                @* Övriga sidor *@
                 @foreach (var item in navItems)
                 {
                     var itemUrl = item.Url();
-                    var isActive = currentUrl != null && currentUrl.StartsWith(itemUrl);
+                    var isActive = currentUrl != null && currentUrl.StartsWith(itemUrl, StringComparison.OrdinalIgnoreCase);
 
                     <a href="@itemUrl" class="nav-link @(isActive ? "active" : "")">
                         @item.Name
@@ -80,11 +100,13 @@
                 <form method="get" action="@searchUrl" class="header-search">
                     <input type="search"
                            name="q"
-                           placeholder=@searchPlaceholder
+                           placeholder="@searchPlaceholder"
                            class="header-search__input" />
                 </form>
 
-
+                <div style="background: red; color: white; padding: 5px;">
+                    DEBUG: Root is @(root != null ? "FOUND" : "NULL")
+                </div>
             </div>
         </nav>
     </div>

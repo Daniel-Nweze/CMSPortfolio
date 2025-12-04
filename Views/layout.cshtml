@@ -1,4 +1,7 @@
-﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@using Umbraco.Cms.Core.Models
+@using Umbraco.Cms.Web.Common.PublishedModels
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ContentModel>
+
 @{
     Layout = null;
     var pageTitle = ViewBag.Title as string ?? "Portfolio";
