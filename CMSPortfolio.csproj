@@ -18,13 +18,9 @@
 
   <ItemGroup>
     <Folder Include="Components\" />
-    <Folder Include="Controllers\" />
     <Folder Include="Data\Models\" />
-    <Folder Include="Models\" />
     <Folder Include="Navigation\" />
     <Folder Include="Partials\" />
-    <Folder Include="Services\" />
-    <Folder Include="Models\Viewmodels\" />
     <Folder Include="Views\Shared\" />
   </ItemGroup>
 

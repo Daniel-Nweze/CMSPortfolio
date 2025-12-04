@@ -1,3 +1,6 @@
+using CMSPortfolio.Data;
+using CMSPortfolio.Services;
+
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.CreateUmbracoBuilder()
@@ -5,6 +8,10 @@ builder.CreateUmbracoBuilder()
     .AddWebsite()
     .AddComposers()
     .Build();
+
+builder.Services.AddTransient<ContactSubmissionRepository>();
+builder.Services.AddTransient<ContactFormService>();
+
 
 WebApplication app = builder.Build();
 

@@ -13,8 +13,9 @@
 
     @if (!string.IsNullOrWhiteSpace(introText))
     {
-        <p class="hero-subtitle">@introText</p>
+        @Html.Raw(introText)
     }
+
 
     <p class="hero-subtitle" style="margin-top:1.5rem;">
         Skills-listan kommer här senare som dynamiska blocks.
