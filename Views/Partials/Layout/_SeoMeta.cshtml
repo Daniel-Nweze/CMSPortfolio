@@ -1,0 +1,60 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@using System.Globalization
+@using Umbraco.Cms.Core.Models.PublishedContent
+@using Umbraco.Extensions
+
+@{
+    var seoTitle = Model.Value<string>("seoTitle");
+    var seoMetaDescription = Model.Value<string>("seoMetaDescription");
+    var seoCanonicalUrl = Model.Value<string>("seoCanonicalUrl");
+    var seoImage = Model.Value<IPublishedContent>("seoImage");
+    var metaRobots = Model.Value<string>("seoRobots");
+
+    var siteName = "Nweze Portfolio";
+
+    var pageTitle = !string.IsNullOrWhiteSpace(seoTitle)
+        ? seoTitle
+        : Model.Name;
+
+    var fullTitle = $"{pageTitle} | {siteName}";
+
+    var baseUrl = $"{Context.Request.Scheme}://{Context.Request.Host}".TrimEnd('/');
+    var relativeUrl = Model.Url();
+
+    var canonicalUrl = !string.IsNullOrWhiteSpace(seoCanonicalUrl)
+        ? seoCanonicalUrl.Trim()
+        : baseUrl + relativeUrl;
+
+    var robotsValue = !string.IsNullOrWhiteSpace(metaRobots)
+        ? metaRobots
+        : "index,follow";
+
+    var culture = CultureInfo.CurrentUICulture;
+    var ogLocale = culture.Name.Replace('-', '_');
+}
+
+<title>@fullTitle</title>
+
+@if (!string.IsNullOrWhiteSpace(seoMetaDescription))
+{
+    <meta name="description" content="@seoMetaDescription" />
+}
+
+<meta name="robots" content="@robotsValue" />
+<link rel="canonical" href="@canonicalUrl" />
+
+<meta property="og:title" content="@fullTitle" />
+@if (!string.IsNullOrWhiteSpace(seoMetaDescription))
+{
+    <meta property="og:description" content="@seoMetaDescription" />
+}
+<meta property="og:url" content="@canonicalUrl" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="@siteName" />
+<meta property="og:locale" content="@ogLocale" />
+
+@if (seoImage != null)
+{
+    var ogImageUrl = seoImage.Url(mode: UrlMode.Absolute);
+    <meta property="og:image" content="@ogImageUrl" />
+}
