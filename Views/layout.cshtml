@@ -4,15 +4,14 @@
 
 @{
     Layout = null;
-    var pageTitle = ViewBag.Title as string ?? "Portfolio";
 }
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="@System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName">
 <head>
     <meta charset="utf-8" />
-    <title>@pageTitle</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    @await Html.PartialAsync("~/Views/Partials/Layout/_SeoMeta.cshtml")
     <link rel="stylesheet" href="~/css/site.css" />
 </head>
 <body>

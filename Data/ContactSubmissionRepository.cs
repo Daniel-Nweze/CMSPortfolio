@@ -31,4 +31,15 @@ public class ContactSubmissionRepository
 
         return scope.Database.Fetch<ContactSubmission>();
     }
+
+    public void Delete(int id)
+    {
+        using var scope = _scopeProvider.CreateScope();
+        var db = scope.Database;
+
+        db.Delete<ContactSubmission>(id);
+
+        scope.Complete();
+    }
+
 }
