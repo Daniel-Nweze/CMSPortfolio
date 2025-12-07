@@ -10,15 +10,10 @@ namespace CMSPortfolio.Models.External
 
     public class QuoteApiResponseDto
     {
-        public required QuoteResult[] Results { get; set; }
-    }
-
-    public class QuoteResult
-    {
         [JsonPropertyName("content")]
-        public required string Content { get; set; }
-        [JsonPropertyName("author")]
-        public required string Author { get; set; }
-    }
+        public string? Content { get; set; }
 
+        [JsonPropertyName("author")]
+        public string? Author { get; set; }
+    }
 }

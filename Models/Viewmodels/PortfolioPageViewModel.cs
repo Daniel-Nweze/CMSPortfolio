@@ -1,22 +1,19 @@
 ﻿using CMSPortfolio.Models.External;
-using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Web.Common.PublishedModels;
 
 namespace CMSPortfolio.Models.Viewmodels
 {
-    public class PortfolioPageViewModel : ContentModel
+    public class PortfolioPageViewModel
     {
+        public IPublishedContent Page { get; }
         public IReadOnlyList<GitHubRepository> GitHubRepositories { get; }
 
         public PortfolioPageViewModel(
-            IPublishedContent content,
+            IPublishedContent page,
             IReadOnlyList<GitHubRepository> gitHubRepositories)
-            : base(content)
         {
+            Page = page;
             GitHubRepositories = gitHubRepositories;
         }
-
-        public IPublishedContent Page => Content;
     }
 }

@@ -10,7 +10,7 @@ namespace CMSPortfolio.Services
 {
     public class SecondaryApiService
     {
-        private const string CacheKey = "quotes_batch";
+        private const string CacheKey = "quote_of_the_day";
 
         private readonly HttpClient _httpClient;
         private readonly IMemoryCache _cache;
@@ -31,48 +31,66 @@ namespace CMSPortfolio.Services
             _logger = logger;
         }
 
-
-        public async Task<List<QuoteOfTheDay>> GetQuotesBatchAsync()
+        public async Task<QuoteOfTheDay?> GetQuoteAsync(bool forceRefresh = false)
         {
-            if (_cache.TryGetValue(CacheKey, out List<QuoteOfTheDay>? cached))
-                return cached!;
+            if (!forceRefresh &&
+                _cache.TryGetValue(CacheKey, out QuoteOfTheDay? cached))
+            {
+                return cached;
+            }
 
             try
             {
-                // Hämta 20 citat i ett paket
-                var response = await _httpClient.GetAsync("https://zenquotes.io/api/quotes");
+                var response = await _httpClient.GetAsync("/random");
 
                 if (!response.IsSuccessStatusCode)
-                    return cached ?? new List<QuoteOfTheDay>();
+                {
+                    _logger.LogWarning("Quote API returned {StatusCode}", response.StatusCode);
+                    return GetCachedOrFallback();
+                }
 
                 var json = await response.Content.ReadAsStringAsync();
-                var arr = JsonSerializer.Deserialize<List<Dictionary<string, string>>>(json);
 
-                if (arr == null) return cached ?? new List<QuoteOfTheDay>();
+                var dto = JsonSerializer.Deserialize<QuoteApiResponseDto>(json, JsonOptions);
+                if (dto == null || string.IsNullOrWhiteSpace(dto.Content))
+                    return GetCachedOrFallback();
 
-                var list = arr.Take(20)
-                              .Select(x => new QuoteOfTheDay
-                              {
-                                  Text = x["q"],
-                                  Author = x["a"]
-                              })
-                              .ToList();
+                var quote = new QuoteOfTheDay
+                {
+                    Text = dto.Content!,
+                    Author = string.IsNullOrWhiteSpace(dto.Author) ? "Unknown" : dto.Author!
+                };
 
-                _cache.Set(CacheKey, list, TimeSpan.FromMinutes(10));
+                _cache.Set(CacheKey, quote, TimeSpan.FromHours(1));
 
-                return list;
+                return quote;
             }
-            catch
+            catch (Exception ex)
             {
-                return cached ?? new List<QuoteOfTheDay>();
+                _logger.LogError(ex, "Error calling quote API");
+                return GetCachedOrFallback();
             }
         }
 
-        private QuoteOfTheDay? GetCachedOrNull()
+        private QuoteOfTheDay GetCachedOrFallback()
         {
-            return _cache.TryGetValue(CacheKey, out QuoteOfTheDay? cached)
-                ? cached
-                : null;
+            if (_cache.TryGetValue(CacheKey, out QuoteOfTheDay? cached) && cached is not null)
+            {
+                return cached;
+            }
+
+            // Fallback-quote om API + cache skiter sig
+            var fallback = new QuoteOfTheDay
+            {
+                Text = "No quote available right now.",
+                Author = "System"
+            };
+
+            _cache.Set(CacheKey, fallback, TimeSpan.FromMinutes(5));
+
+            return fallback;
         }
+
+
     }
 }
