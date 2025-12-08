@@ -1,0 +1,54 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<object>
+@using System.Globalization
+@using Umbraco.Extensions
+
+@{
+    var culture = CultureInfo.CurrentUICulture;
+
+    var message =
+        Umbraco.GetDictionaryValue("CookieBanner.Message", culture)
+        ?? "Vi använder cookies för att förbättra din upplevelse.";
+
+    var acceptLabel =
+        Umbraco.GetDictionaryValue("CookieBanner.AcceptLabel", culture)
+        ?? "Jag förstår";
+}
+
+<div id="cookie-banner"
+     class="cookie-banner"
+     role="dialog"
+     aria-live="polite"
+     aria-label="Cookie information">
+    <div class="cookie-banner__inner">
+        <p class="cookie-banner__text">
+            @message
+        </p>
+        <button type="button"
+                id="cookie-banner-accept"
+                class="cookie-banner__button">
+            @acceptLabel
+        </button>
+    </div>
+</div>
+
+<script>
+    (function () {
+        var banner = document.getElementById('cookie-banner');
+        if (!banner) return;
+
+        var storageKey = 'cookieConsent.accepted';
+
+        if (localStorage.getItem(storageKey) === 'true') {
+            banner.style.display = 'none';
+            return;
+        }
+
+        var btn = document.getElementById('cookie-banner-accept');
+        if (!btn) return;
+
+        btn.addEventListener('click', function () {
+            localStorage.setItem(storageKey, 'true');
+            banner.style.display = 'none';
+        });
+    })();
+</script>
