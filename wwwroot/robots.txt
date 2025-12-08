@@ -1,0 +1,7 @@
+User-agent: *
+Disallow: /umbraco
+Disallow: /umbraco/
+Disallow: /media
+Disallow: /App_Plugins
+
+Sitemap:  https://localhost:44301/sitemap

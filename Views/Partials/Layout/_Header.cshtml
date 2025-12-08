@@ -1,15 +1,33 @@
-﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<object>
 @using System.Linq
 @using System.Collections.Generic
 @using System.Globalization
+@using Umbraco.Cms.Core.Models
 @using Umbraco.Cms.Core.Models.PublishedContent
 @using Umbraco.Extensions
+@using CMSPortfolio.Models.Viewmodels
 
 @{
-    var currentPage = Model as IPublishedContent;
+    IPublishedContent? currentPage = null;
+
+    switch (Model)
+    {
+        case IPublishedContent ip:
+            currentPage = ip;
+            break;
+
+        case ContentModel cm:
+            currentPage = cm.Content;
+            break;
+
+        case PortfolioPageViewModel vm:
+            currentPage = vm.Page;
+            break;
+    }
+
     var root = currentPage?.Root();
 
-    var navItems = root?.Children?
+    var navItems = root?.Children()?
         .Where(x => x.IsVisible()
                     && x.ContentType.Alias != "searchPage"
                     && x.ContentType.Alias != "errorPage")
@@ -40,7 +58,7 @@
         ?? (isSv ? "Sök..." : "Search...");
 
     var searchPage = root?
-        .Children
+        .Children() // extension, inte property
         .FirstOrDefault(x => x.ContentType.Alias == "searchPage");
 
     var searchUrl = searchPage?.Url() ?? "#";
@@ -103,8 +121,6 @@
                            placeholder="@searchPlaceholder"
                            class="header-search__input" />
                 </form>
-
-               
             </div>
         </nav>
     </div>

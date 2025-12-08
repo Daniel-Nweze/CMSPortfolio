@@ -1,26 +1,52 @@
-﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
-@using System.Globalization
+﻿@using System.Globalization
+@using Umbraco.Cms.Core.Models
 @using Umbraco.Cms.Core.Models.PublishedContent
 @using Umbraco.Extensions
+@using CMSPortfolio.Models.Viewmodels
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<object>
 
 @{
-    var seoTitle = Model.Value<string>("seoTitle");
-    var seoMetaDescription = Model.Value<string>("seoMetaDescription");
-    var seoCanonicalUrl = Model.Value<string>("seoCanonicalUrl");
-    var seoImage = Model.Value<IPublishedContent>("seoImage");
-    var metaRobots = Model.Value<string>("metaRobots");
+    IPublishedContent? content = null;
 
+    switch (Model)
+    {
+        case IPublishedContent ip:
+            content = ip;
+            break;
+
+        case ContentModel cm:
+            content = cm.Content;
+            break;
+
+        case PortfolioPageViewModel vm:
+            content = vm.Page;
+            break;
+    }
 
     var siteName = "Nweze Portfolio";
 
+    if (content == null)
+    {
+        var fallbackTitle = siteName;
+        <title>@fallbackTitle</title>
+        // Ingen mer SEO om vi inte vet vilken sida det är.
+        return;
+    }
+
+    var seoTitle = content.Value<string>("seoTitle");
+    var seoMetaDescription = content.Value<string>("seoMetaDescription");
+    var seoCanonicalUrl = content.Value<string>("seoCanonicalUrl");
+    var seoImage = content.Value<IPublishedContent>("seoImage");
+    var metaRobots = content.Value<string>("metaRobots");
+
     var pageTitle = !string.IsNullOrWhiteSpace(seoTitle)
         ? seoTitle
-        : Model.Name;
+        : content.Name;
 
     var fullTitle = $"{pageTitle} | {siteName}";
 
     var baseUrl = $"{Context.Request.Scheme}://{Context.Request.Host}".TrimEnd('/');
-    var relativeUrl = Model.Url();
+    var relativeUrl = content.Url();
 
     var canonicalUrl = !string.IsNullOrWhiteSpace(seoCanonicalUrl)
         ? seoCanonicalUrl.Trim()
