@@ -1,5 +1,5 @@
 ﻿@using CMSPortfolio.Models.Viewmodels
-@using CMSPortfolio.Models.External
+@using System.Linq
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<PortfolioPageViewModel>
 
 @{
@@ -17,7 +17,7 @@
 
         <h2 class="section-heading">Latest GitHub projects</h2>
 
-        @if (Model.GitHubRepositories.Any())
+        @if (Model.GitHubRepositories != null && Model.GitHubRepositories.Any())
         {
             <div class="repo-grid">
                 @foreach (var repo in Model.GitHubRepositories)

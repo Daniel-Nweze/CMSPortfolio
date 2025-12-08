@@ -17,8 +17,8 @@ namespace CMSPortfolio.Models.External
     {
         [JsonPropertyName("content")]
         public required string Content { get; set; }
+
         [JsonPropertyName("author")]
         public required string Author { get; set; }
     }
-
 }

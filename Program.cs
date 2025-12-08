@@ -35,7 +35,6 @@ builder.Services.AddHttpClient<SecondaryApiService>(client =>
 // BackgroundService som uppdaterar cache
 builder.Services.AddHostedService<ApiCacheRefreshService>();
 
-builder.Services.AddHostedService<ApiCacheRefreshService>();
 
 
 

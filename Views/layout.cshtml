@@ -1,6 +1,6 @@
 ﻿@using Umbraco.Cms.Core.Models
 @using Umbraco.Cms.Web.Common.PublishedModels
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ContentModel>
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<object>
 
 @{
     Layout = null;
@@ -11,13 +11,13 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    @await Html.PartialAsync("~/Views/Partials/Layout/_SeoMeta.cshtml")
+    @await Html.PartialAsync("~/Views/Partials/Layout/_SeoMeta.cshtml", Model)
     <link rel="stylesheet" href="~/css/site.css" />
 </head>
 <body>
     <div class="app-shell">
 
-        @await Html.PartialAsync("~/Views/Partials/Layout/_Header.cshtml")
+        @await Html.PartialAsync("~/Views/Partials/Layout/_Header.cshtml", Model)
 
         <main class="site-main" role="main">
             <div class="main-inner">
@@ -25,7 +25,7 @@
             </div>
         </main>
 
-        @await Html.PartialAsync("~/Views/Partials/Layout/_Footer.cshtml")
+        @await Html.PartialAsync("~/Views/Partials/Layout/_Footer.cshtml", Model)
 
     </div>
 

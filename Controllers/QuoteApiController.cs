@@ -1,22 +1,24 @@
 ﻿using CMSPortfolio.Services;
 using Microsoft.AspNetCore.Mvc;
 
-[ApiController]
-[Route("api/quote")]
-public class QuoteApiController : ControllerBase
+namespace CMSPortfolio.Controllers
 {
-    private readonly SecondaryApiService _secondary;
-
-    public QuoteApiController(SecondaryApiService secondary)
+    [ApiController]
+    [Route("api/quote")]
+    public class QuoteApiController : ControllerBase
     {
-        _secondary = secondary;
-    }
+        private readonly SecondaryApiService _secondary;
 
-    [HttpGet]
-    public async Task<IActionResult> Get()
-    {
-        var list = await _secondary.GetQuotesBatchAsync();
-        return Ok(list);
-    }
+        public QuoteApiController(SecondaryApiService secondary)
+        {
+            _secondary = secondary;
+        }
 
+        [HttpGet]
+        public async Task<IActionResult> Get()
+        {
+            var list = await _secondary.GetQuotesBatchAsync();
+            return Ok(list);
+        }
+    }
 }

@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using CMSPortfolio.Models.External;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace CMSPortfolio.Services
 {
@@ -31,7 +33,6 @@ namespace CMSPortfolio.Services
             _logger = logger;
         }
 
-
         public async Task<List<QuoteOfTheDay>> GetQuotesBatchAsync()
         {
             if (_cache.TryGetValue(CacheKey, out List<QuoteOfTheDay>? cached))
@@ -39,31 +40,33 @@ namespace CMSPortfolio.Services
 
             try
             {
-                // Hämta 20 citat i ett paket
+                // Hämta 20 citat i ett paket från ZenQuotes
                 var response = await _httpClient.GetAsync("https://zenquotes.io/api/quotes");
 
                 if (!response.IsSuccessStatusCode)
                     return cached ?? new List<QuoteOfTheDay>();
 
                 var json = await response.Content.ReadAsStringAsync();
-                var arr = JsonSerializer.Deserialize<List<Dictionary<string, string>>>(json);
+                var arr = JsonSerializer.Deserialize<List<Dictionary<string, string>>>(json, JsonOptions);
 
-                if (arr == null) return cached ?? new List<QuoteOfTheDay>();
+                if (arr == null)
+                    return cached ?? new List<QuoteOfTheDay>();
 
                 var list = arr.Take(20)
-                              .Select(x => new QuoteOfTheDay
-                              {
-                                  Text = x["q"],
-                                  Author = x["a"]
-                              })
-                              .ToList();
+                    .Select(x => new QuoteOfTheDay
+                    {
+                        Text = x["q"],
+                        Author = x["a"]
+                    })
+                    .ToList();
 
                 _cache.Set(CacheKey, list, TimeSpan.FromMinutes(10));
 
                 return list;
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "Error calling ZenQuotes API");
                 return cached ?? new List<QuoteOfTheDay>();
             }
         }
