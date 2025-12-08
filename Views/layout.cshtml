@@ -29,6 +29,8 @@
 
     </div>
 
+    @await Html.PartialAsync("~/Views/Partials/Layout/_CookieConsent.cshtml", Model)
+
     @RenderSection("Scripts", required: false)
 </body>
 </html>
