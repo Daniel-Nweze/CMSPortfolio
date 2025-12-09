@@ -1,5 +1,4 @@
-﻿// Infrastructure/Migrations/ContactFormMigration.cs
-using NPoco;
+﻿using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Events;
@@ -59,6 +58,7 @@ public class RunContactFormMigration : INotificationHandler<UmbracoApplicationSt
         var upgrader = new Upgrader(plan);
 
         _logger.LogInformation("Running ContactForm migrations");
+        // ✔ Kör async-varianten – den är *inte* obsolete
         upgrader.ExecuteAsync(_migrationPlanExecutor, _coreScopeProvider, _keyValueService);
     }
 }
