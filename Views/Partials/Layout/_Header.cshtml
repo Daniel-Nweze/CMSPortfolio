@@ -52,10 +52,12 @@
 
     var culture = isSv ? new CultureInfo("sv-SE") : new CultureInfo("en-US");
 
-    // Dictionary för sök-placeholder
-    var searchPlaceholder =
-        Umbraco.GetDictionaryValue("SearchPlaceholder", culture)
-        ?? (isSv ? "Sök..." : "Search...");
+    // Dictionary för sök-placeholder (header)
+    var dictSearchPlaceholder = Umbraco.GetDictionaryValue("SearchPlaceholder", culture);
+    var searchPlaceholder = string.IsNullOrWhiteSpace(dictSearchPlaceholder)
+        ? (isSv ? "Sök..." : "Search...")
+        : dictSearchPlaceholder;
+
 
     var searchPage = root?
         .Children() // extension, inte property
@@ -121,6 +123,7 @@
                            placeholder="@searchPlaceholder"
                            class="header-search__input" />
                 </form>
+
             </div>
         </nav>
     </div>
