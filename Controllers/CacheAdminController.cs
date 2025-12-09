@@ -53,14 +53,16 @@ namespace CMSPortfolio.Controllers
         [HttpPost("refresh")]
         public async Task<IActionResult> Refresh()
         {
-            // Antagande: dina services har metoder som triggar hämtning.
-            // Om inte, kan vi tvinga en refresh genom att bara slå på endpoints
-            // som ändå använder cache med lazy-load.
-            // To DO i dina services för att implementera detta ordentligt.
+            // Tvinga omhämtning från båda API:erna.
+            // GitHub: vi använder forceRefresh-flaggan.
+            await _gitHubService.GetRepositoriesAsync(forceRefresh: true);
 
-
+            // Quotes: cachingen ligger i SecondaryApiService,
+            // metoden hämtar nytt om inget finns eller cache har gått ut.
+            await _quotesService.GetQuotesBatchAsync();
 
             return NoContent();
         }
+
     }
 }
