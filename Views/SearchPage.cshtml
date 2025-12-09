@@ -4,7 +4,12 @@
 @using Umbraco.Cms.Core.Models.PublishedContent
 @using Umbraco.Cms.Core.Web
 @using Umbraco.Cms.Web.Common
+@using Umbraco.Extensions
 @using ContentModels = Umbraco.Cms.Web.Common.PublishedModels;
+@using System.Globalization
+
+
+
 
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
 
@@ -14,9 +19,24 @@
 @{
     Layout = "layout.cshtml";
 
+    // Redaktörsstyrd introtext från doctype (SearchPage)
+    var introText = Model.Value<string>("introText");
+
     // query från ?q= i URL:en
-    var query = Context.Request.Query["q"].ToString()?.Trim();
+    var query = (Context.Request.Query["q"].ToString() ?? string.Empty).Trim();
     var hasQuery = !string.IsNullOrWhiteSpace(query);
+
+    var culture = CultureInfo.CurrentUICulture;
+    var isSv = culture.TwoLetterISOLanguageName.Equals("sv", StringComparison.OrdinalIgnoreCase);
+
+    var searchPlaceholder =
+        Umbraco.GetDictionaryValue("SearchPage.Placeholder", culture)
+        ?? (isSv ? "Sök efter innehåll..." : "Search content...");
+
+    var searchButtonLabel =
+        Umbraco.GetDictionaryValue("SearchPage.ButtonLabel", culture)
+        ?? (isSv ? "Sök" : "Search");
+
 
     var currentRoot = Model.Root();
     var currentRootKey = currentRoot?.Key;
@@ -27,7 +47,7 @@
     {
         var searcher = index.Searcher;
 
-        // enkel "managed" text-sökning
+        // Enkel "managed" text-sökning
         var examineQuery = searcher
             .CreateQuery("content")
             .ManagedQuery(query);
@@ -72,23 +92,33 @@
 <section class="search-page">
     <div class="container">
         <header class="search-page__header">
-            <h1>Sök</h1>
+            <h1>@Model.Name</h1>
 
             <form method="get" action="@Model.Url()" class="search-page__form">
                 <input type="search"
                        name="q"
                        value="@query"
-                       placeholder="Sök efter innehåll..."
+                       placeholder="@searchPlaceholder"
                        class="search-input" />
-                <button type="submit" class="btn btn-primary">Sök</button>
+                <button type="submit" class="btn btn-primary">@searchButtonLabel</button>
+
             </form>
         </header>
 
         @if (!hasQuery)
         {
-            <p class="search-page__info">
-                Skriv något i sökfältet och tryck på Sök.
-            </p>
+            if (!string.IsNullOrWhiteSpace(introText))
+            {
+                <div class="search-page__info">
+                    @Html.Raw(introText)
+                </div>
+            }
+            else
+            {
+                <p class="search-page__info">
+                    Skriv något i sökfältet och tryck på Sök.
+                </p>
+            }
         }
         else if (count == 0)
         {
