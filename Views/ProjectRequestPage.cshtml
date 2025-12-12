@@ -1,0 +1,52 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@using Umbraco.Extensions
+@using System
+
+@{
+    Layout = "layout.cshtml";
+
+    var pageTitle = Model.Value<string>("pageTitle");
+    var introText = Model.Value<string>("introText");
+
+    // Form Picker-värdet är en GUID som string
+    var formGuidString = Model.Value<string>("projectRequestForm");
+    Guid formId = Guid.Empty;
+
+    if (!string.IsNullOrWhiteSpace(formGuidString))
+    {
+        Guid.TryParse(formGuidString, out formId);
+    }
+
+    ViewBag.Title = (string.IsNullOrWhiteSpace(pageTitle) ? Model.Name : pageTitle) + " | Portfolio";
+}
+
+<section class="page-section">
+    <div class="page-container">
+
+        <h1 class="hero-title">
+            @(string.IsNullOrWhiteSpace(pageTitle) ? Model.Name : pageTitle)
+        </h1>
+
+        @if (!string.IsNullOrWhiteSpace(introText))
+        {
+            <div class="hero-subtitle" style="margin-top:1.5rem;">
+                @Html.Raw(introText)
+            </div>
+        }
+
+        <div style="margin-top:2rem;">
+            @if (formId != Guid.Empty)
+            {
+                @await Component.InvokeAsync(
+                "RenderForm",
+                        new { formId = formId, theme = (string)null, includeScripts = true }
+                        )
+                        }
+            else
+            {
+                <p>Inget formulär valt ännu. Välj ett Umbraco Form i backoffice.</p>
+            }
+        </div>
+
+    </div>
+</section>
