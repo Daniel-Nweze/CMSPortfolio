@@ -3,21 +3,46 @@
 
 @{
     Layout = "layout.cshtml";
+
     var heading = Model.Name;
     var introText = Model.Value<string>("introText");
+
+    // Custom property – layout mode (cards / list / grid)
+    var layoutMode = (Model.Value<string>("skillsLayoutMode") ?? "cards").ToLowerInvariant();
+
+    var layoutCss = layoutMode switch
+    {
+        "list" => "skills-layout--list",
+        "grid" => "skills-layout--grid",
+        _ => "skills-layout--cards"
+    };
+
     ViewBag.Title = heading + " | Portfolio";
 }
 
-<section>
+<section class="skills-page @layoutCss">
+
     <h1 class="hero-title">@heading</h1>
 
     @if (!string.IsNullOrWhiteSpace(introText))
     {
-        @Html.Raw(introText)
+        <div class="skills-intro">
+            @Html.Raw(introText)
+        </div>
     }
 
-
-    <p class="hero-subtitle" style="margin-top:1.5rem;">
-        Skills-listan kommer här senare som dynamiska blocks.
-    </p>
+    <ul class="skills-items">
+        <li class="skill-item">
+            <h2 class="skill-title">Backend (.NET)</h2>
+            <p class="skill-body">C#, ASP.NET Core, EF Core, API-design.</p>
+        </li>
+        <li class="skill-item">
+            <h2 class="skill-title">CMS & Umbraco</h2>
+            <p class="skill-body">Editor-first struktur, kompositioner, API-integrationer.</p>
+        </li>
+        <li class="skill-item">
+            <h2 class="skill-title">Frontend</h2>
+            <p class="skill-body">Razor, modern CSS, tillgängliga komponenter.</p>
+        </li>
+    </ul>
 </section>
