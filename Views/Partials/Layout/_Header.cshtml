@@ -30,7 +30,8 @@
     var navItems = root?.Children()?
         .Where(x => x.IsVisible()
                     && x.ContentType.Alias != "searchPage"
-                    && x.ContentType.Alias != "errorPage")
+                    && x.ContentType.Alias != "errorPage"
+                    && x.ContentType.Alias != "xmlSiteMap")
         .OrderBy(x => x.SortOrder)
         .ToList() ?? new List<IPublishedContent>();
 

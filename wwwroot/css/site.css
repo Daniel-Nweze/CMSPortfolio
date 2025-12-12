@@ -448,3 +448,74 @@ a {
 }
 
 
+/* ==== Skills page – layout styrs av custom property ==== */
+
+.skills-page {
+    margin-top: 3rem;
+}
+
+    .skills-page .skills-intro {
+        margin-top: 1.5rem;
+        color: var(--color-text-muted);
+        max-width: 56rem;
+    }
+
+.skills-items {
+    list-style: none;
+    margin: 2rem 0 0;
+    padding: 0;
+}
+
+/* Grund-kort */
+.skill-item {
+    border-radius: var(--radius-xl);
+    padding: 1.5rem 1.75rem;
+    background: var(--color-bg-alt);
+    border: 1px solid var(--color-border);
+}
+
+.skill-title {
+    font-size: 1.15rem;
+    margin: 0 0 0.35rem;
+}
+
+.skill-body {
+    margin: 0;
+    color: var(--color-text-muted);
+}
+
+/* ====== Layout-varianter ====== */
+
+/* Cards layout – kort i grid */
+.skills-layout--cards .skills-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.25rem;
+}
+
+/* List layout – pills i en kolumn */
+.skills-layout--list .skills-items {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.skills-layout--list .skill-item {
+    border-radius: 999px;
+    padding: 0.9rem 1.25rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+}
+
+/* Grid layout – mer "techy" variant */
+.skills-layout--grid .skills-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1rem;
+}
+
+.skills-layout--grid .skill-item {
+    background: transparent;
+    border-style: dashed;
+}

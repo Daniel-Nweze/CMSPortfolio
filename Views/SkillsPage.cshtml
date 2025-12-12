@@ -1,23 +1,77 @@
-﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@using Umbraco.Cms.Core.Models.Blocks
 @using Umbraco.Extensions
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
 
 @{
     Layout = "layout.cshtml";
+
     var heading = Model.Name;
     var introText = Model.Value<string>("introText");
+
+    // Custom property – layout mode (cards / list / grid)
+    var layoutMode = (Model.Value<string>("skillsLayoutMode") ?? "cards").ToLowerInvariant();
+
+    var layoutCss = layoutMode switch
+    {
+        "list" => "skills-layout--list",
+        "grid" => "skills-layout--grid",
+        _ => "skills-layout--cards"
+    };
+
+    // Block List – skills
+    var skillsBlocks = Model.Value<BlockListModel>("skills");
+
     ViewBag.Title = heading + " | Portfolio";
 }
 
-<section>
+<section class="skills-page @layoutCss">
     <h1 class="hero-title">@heading</h1>
 
     @if (!string.IsNullOrWhiteSpace(introText))
     {
-        @Html.Raw(introText)
+        <div class="skills-intro">
+            @Html.Raw(introText)
+        </div>
     }
 
+    <ul class="skills-items">
+        @if (skillsBlocks != null && skillsBlocks.Any())
+        {
+            // Rendera block från backoffice
+            foreach (var block in skillsBlocks)
+            {
+                var title = block.Content.Value<string>("skillTitle");
+                var description = block.Content.Value<string>("skillDescription");
 
-    <p class="hero-subtitle" style="margin-top:1.5rem;">
-        Skills-listan kommer här senare som dynamiska blocks.
-    </p>
+                <li class="skill-item">
+                    @if (!string.IsNullOrWhiteSpace(title))
+                    {
+                        <h2 class="skill-title">@title</h2>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(description))
+                    {
+                        <div class="skill-body">
+                            @Html.Raw(description)
+                        </div>
+                    }
+                </li>
+            }
+        }
+        else
+        {
+            // Fallback om redaktören inte lagt in något än
+            <li class="skill-item">
+                <h2 class="skill-title">Backend (.NET)</h2>
+                <p class="skill-body">C#, ASP.NET Core, EF Core, API-design.</p>
+            </li>
+            <li class="skill-item">
+                <h2 class="skill-title">CMS & Umbraco</h2>
+                <p class="skill-body">Editor-first struktur, kompositioner, API-integrationer.</p>
+            </li>
+            <li class="skill-item">
+                <h2 class="skill-title">Frontend</h2>
+                <p class="skill-body">Razor, modern CSS, tillgängliga komponenter.</p>
+            </li>
+        }
+    </ul>
 </section>
